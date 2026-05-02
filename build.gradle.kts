@@ -4,7 +4,7 @@ plugins {
 }
 
 application {
-    mainClass.set("Main")
+    mainClass.set("Main") // default gradle run target
 }
 
 sourceSets {
@@ -17,4 +17,10 @@ sourceSets {
 
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
+}
+
+// Additional task for the GUI
+tasks.register<JavaExec>("runGUI") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("ClubManagementGUI")
 }
