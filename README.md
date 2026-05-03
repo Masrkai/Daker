@@ -94,6 +94,7 @@ Both iterative and recursive implementations are provided in `BinarySearch.java`
 ### Overall Program Complexity
 
 The dominant operation is **sorting**. For the overall program:
+
 - **Worst case**: O(n²) when using Bubble Sort or Selection Sort on large datasets
 - **Best case**: O(n log n) when Merge Sort is the primary sorting operation
 - **Recommendation**: For production use with large datasets, prefer Merge Sort or use Java's built-in `Collections.sort()` (Timsort, O(n log n)).
@@ -122,26 +123,17 @@ Expected output should show Java 21 or higher.
 1. **Navigate to the project root directory**:
 
 ```bash
-cd ClubSystem
+gradle build
 ```
 
-2. **Compile all source files**:
+2. **Run the application**:
 
 ```bash
-javac src/*.java
+gradle run     # for the CLI
+gradle runGUI  # for the GUI
 ```
 
-3. **Run the application**:
-
-```bash
-java ClubSystem.src.Main
-```
-
-### Using an IDE
-
-1. Open the `ClubSystem` folder in your IDE
-2. Mark `src/` as the source root
-3. Run `Main.java` (located in `ClubSystem.src` package)
+see [gradle build](build.gradle.kts) to verify the build process
 
 ---
 
@@ -231,4 +223,5 @@ See `report.pdf` for the complete project documentation including:
 
 ## License
 
-This project is for educational purposes.
+The project is licensed under the MIT license, see the license [here](LICENSE)
+Note: This project is for educational purposes.
