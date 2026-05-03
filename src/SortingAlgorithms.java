@@ -21,7 +21,8 @@ public class SortingAlgorithms {
     /**
      * Sorts a list of clubs by name in ascending order using Bubble Sort.
      * 
-     * Time Complexity: O(n²) in worst/average case, O(n) in best case (already sorted)
+     * Time Complexity: O(n²) in worst/average case, O(n) in best case (already
+     * sorted)
      * Space Complexity: O(1) auxiliary space
      * 
      * @param clubs The list of clubs to sort (modified in-place)

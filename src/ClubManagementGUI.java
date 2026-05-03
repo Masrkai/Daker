@@ -2,15 +2,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import java.util.ArrayList;
 
-/**
- * ClubManagementGUI.java
- * The Graphical User Interface for the Club Management System.
- * This class integrates all algorithms and data structures.
- */
 public class ClubManagementGUI extends JFrame {
-    
+
     // Data sources initialized from ClubSystem
     private List<ClubSystem.Club> clubs = ClubSystem.initializeClubs();
     private List<ClubSystem.Member> allMembers = ClubSystem.initializeMembers();
@@ -51,14 +45,14 @@ public class ClubManagementGUI extends JFrame {
     // --- PANEL FOR CLUBS ---
     private JPanel createClubPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        String[] columns = {"Club Name", "Manager", "Location", "Branches Count"};
+        String[] columns = { "Club Name", "Manager", "Location", "Branches Count" };
         clubModel = new DefaultTableModel(columns, 0);
         clubTable = new JTable(clubModel);
 
         JPanel controlPanel = new JPanel();
         JButton sortBtn = new JButton("Sort by Name (Bubble Sort)");
         JButton searchBtn = new JButton("Search by Name (Binary Search)");
-        
+
         sortBtn.addActionListener(e -> {
             SortingAlgorithms.bubbleSortClubs(clubs);
             refreshTables();
@@ -71,7 +65,8 @@ public class ClubManagementGUI extends JFrame {
             if (name != null && !name.isEmpty()) {
                 ClubSystem.Club result = BinarySearch.binarySearchClub(clubs, name);
                 if (result != null) {
-                    JOptionPane.showMessageDialog(this, "Found: " + result.name() + "\nManager: " + result.manager() + "\nLocation: " + result.location());
+                    JOptionPane.showMessageDialog(this, "Found: " + result.name() + "\nManager: " + result.manager()
+                            + "\nLocation: " + result.location());
                 } else {
                     JOptionPane.showMessageDialog(this, "Club not found.");
                 }
@@ -88,7 +83,7 @@ public class ClubManagementGUI extends JFrame {
     // --- PANEL FOR MEMBERS ---
     private JPanel createMemberPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        String[] columns = {"ID", "Name", "Phone", "Children"};
+        String[] columns = { "ID", "Name", "Phone", "Children" };
         memberModel = new DefaultTableModel(columns, 0);
         memberTable = new JTable(memberModel);
 
@@ -130,7 +125,7 @@ public class ClubManagementGUI extends JFrame {
     // --- PANEL FOR SPORTS ---
     private JPanel createSportPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        String[] columns = {"Sport ID", "Sport Name", "Teams Count"};
+        String[] columns = { "Sport ID", "Sport Name", "Teams Count" };
         sportModel = new DefaultTableModel(columns, 0);
         sportTable = new JTable(sportModel);
 
@@ -155,19 +150,19 @@ public class ClubManagementGUI extends JFrame {
         // Refresh Clubs
         clubModel.setRowCount(0);
         for (ClubSystem.Club c : clubs) {
-            clubModel.addRow(new Object[]{c.name(), c.manager(), c.location(), c.branches().size()});
+            clubModel.addRow(new Object[] { c.name(), c.manager(), c.location(), c.branches().size() });
         }
 
         // Refresh Members
         memberModel.setRowCount(0);
         for (ClubSystem.Member m : allMembers) {
-            memberModel.addRow(new Object[]{m.id(), m.name(), m.phone(), m.numberOfChildren()});
+            memberModel.addRow(new Object[] { m.id(), m.name(), m.phone(), m.numberOfChildren() });
         }
 
         // Refresh Sports
         sportModel.setRowCount(0);
         for (ClubSystem.Sport s : sports) {
-            sportModel.addRow(new Object[]{s.id(), s.name(), s.numberOfTeams()});
+            sportModel.addRow(new Object[] { s.id(), s.name(), s.numberOfTeams() });
         }
     }
 
@@ -175,7 +170,8 @@ public class ClubManagementGUI extends JFrame {
         // Setting a nice look and feel
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         SwingUtilities.invokeLater(() -> {
             new ClubManagementGUI().setVisible(true);

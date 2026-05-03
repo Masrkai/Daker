@@ -93,7 +93,8 @@ public class BinarySearch {
     /**
      * Helper method for recursive club binary search.
      */
-    private static ClubSystem.Club binarySearchClubRecursiveHelper(List<ClubSystem.Club> clubs, String name, int left, int right) {
+    private static ClubSystem.Club binarySearchClubRecursiveHelper(List<ClubSystem.Club> clubs, String name, int left,
+            int right) {
         if (left > right) {
             return null;
         }
@@ -128,7 +129,8 @@ public class BinarySearch {
     /**
      * Helper method for recursive member binary search.
      */
-    private static ClubSystem.Member binarySearchMemberRecursiveHelper(List<ClubSystem.Member> members, int id, int left, int right) {
+    private static ClubSystem.Member binarySearchMemberRecursiveHelper(List<ClubSystem.Member> members, int id,
+            int left, int right) {
         if (left > right) {
             return null;
         }

@@ -6,7 +6,8 @@ import java.util.Scanner;
  * Main.java
  * 
  * Entry point for the Club Management System.
- * Provides an interactive console-based menu for managing clubs, members, and sports.
+ * Provides an interactive console-based menu for managing clubs, members, and
+ * sports.
  * Demonstrates sorting algorithms (Bubble Sort, Selection Sort, Merge Sort) and
  * binary search functionality.
  * 
@@ -16,7 +17,8 @@ import java.util.Scanner;
  * - Selection Sort: O(n²) all cases
  * - Merge Sort: O(n log n) all cases
  * - Binary Search: O(log n)
- * - Linear search (findMemberById across clubs): O(c * m) where c = clubs, m = members per club
+ * - Linear search (findMemberById across clubs): O(c * m) where c = clubs, m =
+ * members per club
  */
 public class Main {
 
@@ -104,8 +106,8 @@ public class Main {
     // ============================
 
     private static void displayAllData(List<ClubSystem.Club> clubs,
-                                       List<ClubSystem.Member> members,
-                                       List<ClubSystem.Sport> sports) {
+            List<ClubSystem.Member> members,
+            List<ClubSystem.Sport> sports) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("              DISPLAYING ALL DATA");
         System.out.println("=".repeat(60));
@@ -370,7 +372,8 @@ public class Main {
         int children;
         try {
             children = Integer.parseInt(scanner.nextLine().trim());
-            if (children < 0) children = 0;
+            if (children < 0)
+                children = 0;
         } catch (NumberFormatException e) {
             children = 0;
         }
@@ -409,7 +412,8 @@ public class Main {
         int teams;
         try {
             teams = Integer.parseInt(scanner.nextLine().trim());
-            if (teams < 0) teams = 0;
+            if (teams < 0)
+                teams = 0;
         } catch (NumberFormatException e) {
             teams = 0;
         }
@@ -461,8 +465,8 @@ public class Main {
     // ============================
 
     private static void displayStatistics(List<ClubSystem.Club> clubs,
-                                        List<ClubSystem.Member> members,
-                                        List<ClubSystem.Sport> sports) {
+            List<ClubSystem.Member> members,
+            List<ClubSystem.Sport> sports) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("              SYSTEM STATISTICS");
         System.out.println("=".repeat(60));

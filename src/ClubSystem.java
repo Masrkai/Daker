@@ -1,17 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * ClubSystem.java
- * 
- * Defines the core data structures (records) and initialization functions
- * for the Club Management System.
- * 
- * Records are used for immutable data structures, providing:
- * - Automatic implementations of equals(), hashCode(), and toString()
- * - Compact syntax for data carriers
- * - Thread-safe by design (immutable)
- */
 public class ClubSystem {
 
     // ============================
@@ -20,12 +9,12 @@ public class ClubSystem {
 
     /**
      * Represents a sports club with its details and members.
-     * 
-     * @param name      The name of the club
-     * @param branches  List of branch locations
-     * @param manager   Name of the club manager
-     * @param location  Primary location of the club
-     * @param members   List of members belonging to this club
+     *
+     * @param name     The name of the club
+     * @param branches List of branch locations
+     * @param manager  Name of the club manager
+     * @param location Primary location of the club
+     * @param members  List of members belonging to this club
      */
     public record Club(
             String name,
@@ -37,10 +26,10 @@ public class ClubSystem {
 
     /**
      * Represents a member of a club.
-     * 
-     * @param id              Unique identifier for the member
-     * @param name            Name of the member
-     * @param phone           Phone number of the member
+     *
+     * @param id               Unique identifier for the member
+     * @param name             Name of the member
+     * @param phone            Phone number of the member
      * @param numberOfChildren Number of children the member has
      */
     public record Member(
@@ -52,7 +41,7 @@ public class ClubSystem {
 
     /**
      * Represents a sport offered by the club system.
-     * 
+     *
      * @param name          Name of the sport
      * @param id            Unique identifier for the sport
      * @param numberOfTeams Number of teams for this sport
@@ -69,7 +58,7 @@ public class ClubSystem {
 
     /**
      * Creates and returns a list of predefined clubs with sample data.
-     * 
+     *
      * @return A list of initialized Club records
      */
     public static List<Club> initializeClubs() {
@@ -164,7 +153,7 @@ public class ClubSystem {
     /**
      * Creates and returns a list of predefined members with sample data.
      * These members are also included in their respective clubs.
-     * 
+     *
      * @return A list of all initialized Member records
      */
     public static List<Member> initializeMembers() {
@@ -197,7 +186,7 @@ public class ClubSystem {
 
     /**
      * Creates and returns a list of predefined sports with sample data.
-     * 
+     *
      * @return A list of initialized Sport records
      */
     public static List<Sport> initializeSports() {
@@ -220,7 +209,7 @@ public class ClubSystem {
 
     /**
      * Displays all clubs with their details in a formatted manner.
-     * 
+     *
      * @param clubs The list of clubs to display
      */
     public static void displayClubs(List<Club> clubs) {
@@ -251,7 +240,7 @@ public class ClubSystem {
 
     /**
      * Displays all members in a formatted manner.
-     * 
+     *
      * @param members The list of members to display
      */
     public static void displayMembers(List<Member> members) {
@@ -275,7 +264,7 @@ public class ClubSystem {
 
     /**
      * Displays all sports in a formatted manner.
-     * 
+     *
      * @param sports The list of sports to display
      */
     public static void displaySports(List<Sport> sports) {
@@ -299,7 +288,7 @@ public class ClubSystem {
 
     /**
      * Adds a new member to a specific club.
-     * 
+     *
      * @param clubs    The list of clubs
      * @param clubName The name of the club to add the member to
      * @param member   The member to add
@@ -312,7 +301,8 @@ public class ClubSystem {
 
         for (Club club : clubs) {
             if (club.name().equalsIgnoreCase(clubName)) {
-                // Since records are immutable, we need to create a new Club with updated members
+                // Since records are immutable, we need to create a new Club with updated
+                // members
                 List<Member> updatedMembers = new ArrayList<>(club.members());
                 updatedMembers.add(member);
 
@@ -335,7 +325,7 @@ public class ClubSystem {
 
     /**
      * Adds a new club to the list.
-     * 
+     *
      * @param clubs The list of clubs
      * @param club  The club to add
      * @return true if added successfully
@@ -349,7 +339,7 @@ public class ClubSystem {
 
     /**
      * Adds a new sport to the list.
-     * 
+     *
      * @param sports The list of sports
      * @param sport  The sport to add
      * @return true if added successfully
@@ -363,7 +353,7 @@ public class ClubSystem {
 
     /**
      * Removes a member from a specific club by member ID.
-     * 
+     *
      * @param clubs    The list of clubs
      * @param clubName The name of the club
      * @param memberId The ID of the member to remove
@@ -399,7 +389,7 @@ public class ClubSystem {
 
     /**
      * Finds a member by ID across all clubs.
-     * 
+     *
      * @param clubs    The list of clubs to search through
      * @param memberId The ID of the member to find
      * @return The Member if found, null otherwise
@@ -422,7 +412,7 @@ public class ClubSystem {
 
     /**
      * Counts the total number of members across all clubs.
-     * 
+     *
      * @param clubs The list of clubs
      * @return The total member count
      */
@@ -440,7 +430,7 @@ public class ClubSystem {
 
     /**
      * Gets all members from all clubs as a flat list.
-     * 
+     *
      * @param clubs The list of clubs
      * @return A list containing all members from all clubs
      */
