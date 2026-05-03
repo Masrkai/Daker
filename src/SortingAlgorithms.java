@@ -4,9 +4,9 @@ import java.util.List;
 
 /**
  * SortingAlgorithms.java
- * 
+ *
  * Provides sorting functionality for Club, Member, and Sport collections.
- * 
+ *
  * Implemented algorithms:
  * - Bubble Sort: O(n²) time, O(1) space — used for sorting clubs by name
  * - Selection Sort: O(n²) time, O(1) space — used for sorting members by ID
@@ -20,11 +20,11 @@ public class SortingAlgorithms {
 
     /**
      * Sorts a list of clubs by name in ascending order using Bubble Sort.
-     * 
+     *
      * Time Complexity: O(n²) in worst/average case, O(n) in best case (already
      * sorted)
      * Space Complexity: O(1) auxiliary space
-     * 
+     *
      * @param clubs The list of clubs to sort (modified in-place)
      */
     public static void bubbleSortClubs(List<ClubSystem.Club> clubs) {
@@ -65,10 +65,10 @@ public class SortingAlgorithms {
     /**
      * Sorts a list of members by ID in ascending order using Selection Sort.
      * Minimizes the number of swaps (at most n swaps).
-     * 
+     *
      * Time Complexity: O(n²) in all cases
      * Space Complexity: O(1) auxiliary space
-     * 
+     *
      * @param members The list of members to sort (modified in-place)
      */
     public static void selectionSortMembers(List<ClubSystem.Member> members) {
@@ -104,10 +104,10 @@ public class SortingAlgorithms {
     /**
      * Sorts a list of sports by name in ascending order using Merge Sort.
      * Returns a new sorted list; the original list is not modified.
-     * 
+     *
      * Time Complexity: O(n log n) in all cases
      * Space Complexity: O(n) auxiliary space
-     * 
+     *
      * @param sports The list of sports to sort
      * @return A new list containing the sports sorted by name
      */
@@ -194,7 +194,7 @@ public class SortingAlgorithms {
 
     /**
      * Generic bubble sort using a custom comparator.
-     * 
+     *
      * @param <T>        The type of elements in the list
      * @param list       The list to sort (modified in-place)
      * @param comparator The comparator defining the sort order
@@ -225,7 +225,7 @@ public class SortingAlgorithms {
 
     /**
      * Generic selection sort using a custom comparator.
-     * 
+     *
      * @param <T>        The type of elements in the list
      * @param list       The list to sort (modified in-place)
      * @param comparator The comparator defining the sort order
@@ -255,7 +255,7 @@ public class SortingAlgorithms {
     /**
      * Generic merge sort using a custom comparator.
      * Returns a new sorted list; the original is not modified.
-     * 
+     *
      * @param <T>        The type of elements in the list
      * @param list       The list to sort
      * @param comparator The comparator defining the sort order

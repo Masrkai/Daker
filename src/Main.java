@@ -4,13 +4,13 @@ import java.util.Scanner;
 
 /**
  * Main.java
- * 
+ *
  * Entry point for the Club Management System.
  * Provides an interactive console-based menu for managing clubs, members, and
  * sports.
  * Demonstrates sorting algorithms (Bubble Sort, Selection Sort, Merge Sort) and
  * binary search functionality.
- * 
+ *
  * Big-O Analysis of the overall program:
  * - Sorting dominates the time complexity of most operations.
  * - Bubble Sort: O(n²) worst/average, O(n) best case
