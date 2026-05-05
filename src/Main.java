@@ -6,33 +6,22 @@ import java.util.Scanner;
  * Main.java
  *
  * Entry point for the Club Management System.
- * Provides an interactive console-based menu for managing clubs, members, and
- * sports.
- * Demonstrates sorting algorithms (Bubble Sort, Selection Sort, Merge Sort) and
- * binary search functionality.
- *
- * Big-O Analysis of the overall program:
- * - Sorting dominates the time complexity of most operations.
- * - Bubble Sort: O(n²) worst/average, O(n) best case
- * - Selection Sort: O(n²) all cases
- * - Merge Sort: O(n log n) all cases
- * - Binary Search: O(log n)
- * - Linear search (findMemberById across clubs): O(c * m) where c = clubs, m =
- * members per club
+ * Uses DatabaseHandler for all data persistence.
  */
 public class Main {
 
     private static final Scanner scanner = new Scanner(System.in);
+    private static final DatabaseHandler db = DatabaseHandler.getInstance();
 
     public static void main(String[] args) {
         System.out.println("=".repeat(60));
         System.out.println("     WELCOME TO THE CLUB MANAGEMENT SYSTEM");
         System.out.println("=".repeat(60));
 
-        // Initialize data
-        List<ClubSystem.Club> clubs = ClubSystem.initializeClubs();
-        List<ClubSystem.Member> members = ClubSystem.initializeMembers();
-        List<ClubSystem.Sport> sports = ClubSystem.initializeSports();
+        // Initialize data from database
+        List<ClubSystem.Club> clubs = db.getAllClubs();
+        List<ClubSystem.Member> members = db.getAllMembers();
+        List<ClubSystem.Sport> sports = db.getAllSports();
 
         boolean running = true;
 
@@ -64,6 +53,7 @@ public class Main {
                 case 11 -> displayStatistics(clubs, members, sports);
                 case 0 -> {
                     running = false;
+                    db.close();
                     System.out.println("\nThank you for using the Club Management System. Goodbye!");
                 }
                 default -> System.out.println("\nInvalid choice. Please try again.");
@@ -222,7 +212,6 @@ public class Main {
         System.out.println("Time Complexity: O(log n)");
         System.out.println("-".repeat(60));
 
-        // First, ensure clubs are sorted
         SortingAlgorithms.bubbleSortClubs(clubs);
 
         System.out.print("\nEnter club name to search: ");
@@ -260,7 +249,6 @@ public class Main {
         System.out.println("Time Complexity: O(log n)");
         System.out.println("-".repeat(60));
 
-        // First, ensure members are sorted
         SortingAlgorithms.selectionSortMembers(members);
 
         System.out.print("\nEnter member ID to search: ");
@@ -293,7 +281,7 @@ public class Main {
     }
 
     // ============================
-    // ADD OPERATIONS
+    // ADD OPERATIONS (DB-backed)
     // ============================
 
     private static void addNewClub(List<ClubSystem.Club> clubs) {
@@ -326,7 +314,8 @@ public class Main {
         ClubSystem.Club newClub = new ClubSystem.Club(
                 name, branches, manager, location, new ArrayList<>());
 
-        if (ClubSystem.addClub(clubs, newClub)) {
+        if (db.addClub(newClub)) {
+            clubs.add(newClub);
             System.out.println("\n✓ Club \"" + name + "\" added successfully!");
         } else {
             System.out.println("\n✗ Failed to add club.");
@@ -372,15 +361,17 @@ public class Main {
         int children;
         try {
             children = Integer.parseInt(scanner.nextLine().trim());
-            if (children < 0)
-                children = 0;
+            if (children < 0) children = 0;
         } catch (NumberFormatException e) {
             children = 0;
         }
 
         ClubSystem.Member newMember = new ClubSystem.Member(id, name, phone, children);
 
-        if (ClubSystem.addMemberToClub(clubs, clubName, newMember)) {
+        if (db.addMemberToClub(clubName, newMember)) {
+            // Refresh from DB to keep lists in sync
+            clubs.clear();
+            clubs.addAll(db.getAllClubs());
             System.out.println("\n✓ Member \"" + name + "\" added to \"" + clubName + "\" successfully!");
         } else {
             System.out.println("\n✗ Failed to add member.");
@@ -412,15 +403,15 @@ public class Main {
         int teams;
         try {
             teams = Integer.parseInt(scanner.nextLine().trim());
-            if (teams < 0)
-                teams = 0;
+            if (teams < 0) teams = 0;
         } catch (NumberFormatException e) {
             teams = 0;
         }
 
         ClubSystem.Sport newSport = new ClubSystem.Sport(name, id, teams);
 
-        if (ClubSystem.addSport(sports, newSport)) {
+        if (db.addSport(newSport)) {
+            sports.add(newSport);
             System.out.println("\n✓ Sport \"" + name + "\" added successfully!");
         } else {
             System.out.println("\n✗ Failed to add sport.");
@@ -428,7 +419,7 @@ public class Main {
     }
 
     // ============================
-    // REMOVE OPERATIONS
+    // REMOVE OPERATIONS (DB-backed)
     // ============================
 
     private static void removeMember(List<ClubSystem.Club> clubs) {
@@ -453,7 +444,10 @@ public class Main {
             return;
         }
 
-        if (ClubSystem.removeMemberFromClub(clubs, clubName, memberId)) {
+        if (db.removeMemberFromClub(clubName, memberId)) {
+            // Refresh from DB to keep lists in sync
+            clubs.clear();
+            clubs.addAll(db.getAllClubs());
             System.out.println("\n✓ Member with ID " + memberId + " removed from \"" + clubName + "\" successfully!");
         } else {
             System.out.println("\n✗ Member not found or club does not exist.");
@@ -461,7 +455,7 @@ public class Main {
     }
 
     // ============================
-    // STATISTICS
+    // STATISTICS (DB-backed)
     // ============================
 
     private static void displayStatistics(List<ClubSystem.Club> clubs,
@@ -473,7 +467,7 @@ public class Main {
 
         System.out.println("Data Overview:");
         System.out.println("  Total Clubs:   " + clubs.size());
-        System.out.println("  Total Members: " + members.size());
+        System.out.println("  Total Members: " + db.getTotalMemberCount());
         System.out.println("  Total Sports:  " + sports.size());
 
         System.out.println("\nClub Details:");
@@ -486,19 +480,13 @@ public class Main {
         }
 
         System.out.println("\nMember Statistics:");
-        int totalChildren = 0;
-        for (ClubSystem.Member member : members) {
-            totalChildren += member.numberOfChildren();
-        }
+        int totalChildren = db.getTotalChildren();
         System.out.println("  Total Children: " + totalChildren);
         System.out.printf("  Average Children per Member: %.2f%n",
                 members.isEmpty() ? 0 : (double) totalChildren / members.size());
 
         System.out.println("\nSport Statistics:");
-        int totalTeams = 0;
-        for (ClubSystem.Sport sport : sports) {
-            totalTeams += sport.numberOfTeams();
-        }
+        int totalTeams = db.getTotalTeams();
         System.out.println("  Total Teams: " + totalTeams);
         System.out.printf("  Average Teams per Sport: %.2f%n",
                 sports.isEmpty() ? 0 : (double) totalTeams / sports.size());

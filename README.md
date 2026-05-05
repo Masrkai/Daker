@@ -133,7 +133,24 @@ gradle run     # for the CLI
 gradle runGUI  # for the GUI
 ```
 
-see [gradle build](build.gradle.kts) to verify the build process
+> YOU ARE GOOD TO GO FROM HERE FROM NOW ON THESE ARE EXTRAS
+
+3. **Building the Jars**:
+
+```bash
+gradle shadowJar     # for the CLI
+gradle shadowJarGUI  # for the GUI
+```
+
+4. **The Scripts**
+
+there is a [Folder](Scripts) containing any scripts available, however the one we focus on [expose_jars](Scripts/expose_jars.sh) it just makes a folder that is `jars` and moves the built jars from `build/libs` to the newly created `jars` folder should look something like this
+
+![example](img/example.png)
+
+
+
+see [gradle build](build.gradle.kts) to verify the build process and dependencies
 
 ---
 
