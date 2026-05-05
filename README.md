@@ -21,20 +21,7 @@ Daker is a Java application for managing sports clubs, members, and sports. This
 
 ## Project Structure
 
-```
-
-ClubSystem/
-├── src/
-│   ├── ClubSystem.java         # Core data structures (records) and initialization
-│   ├── SortingAlgorithms.java  # Bubble, Selection, and Merge Sort implementations
-│   ├── BinarySearch.java       # Iterative and recursive binary search
-│   ├── Main.java               # Console application entry point and menu system
-│   └── GUI/                    # (Optional) JavaFX GUI extension
-│       └── ClubSystemGUI.java
-├── report.pdf                  # Project report with Big-O analysis
-└── README.md                   # This file
-
-```
+![structure](img/structure.png)
 
 ---
 
