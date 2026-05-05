@@ -42,11 +42,11 @@ ClubSystem/
 
 The system uses Java **records** (Java 21+) for immutable data carriers:
 
-| Record  | Fields                                                                 |
-|---------|------------------------------------------------------------------------|
-| `Club`  | `name`, `branches` (List\<String\>), `manager`, `location`, `members` |
-| `Member`| `id`, `name`, `phone`, `numberOfChildren`                              |
-| `Sport` | `name`, `id`, `numberOfTeams`                                          |
+| Record   | Fields                                                                |
+|----------|-----------------------------------------------------------------------|
+| `Club`   | `name`, `branches` (List\<String\>), `manager`, `location`, `members` |
+| `Member` | `id`, `name`, `phone`, `numberOfChildren`                             |
+| `Sport`  | `name`, `id`, `numberOfTeams`                                         |
 
 Records provide automatic implementations of `equals()`, `hashCode()`, and `toString()`, making them ideal for data transfer objects.
 
@@ -56,18 +56,18 @@ Records provide automatic implementations of `equals()`, `hashCode()`, and `toSt
 
 ### Sorting Algorithms
 
-| Algorithm      | Used For           | Time Complexity | Space Complexity | Characteristics                          |
-|----------------|--------------------|-----------------|------------------|------------------------------------------|
-| **Bubble Sort**| Clubs by name      | O(n²)           | O(1)             | Simple, adaptive (stops early if sorted) |
-| **Selection Sort**| Members by ID   | O(n²)           | O(1)             | Minimizes swaps (at most n swaps)        |
-| **Merge Sort** | Sports by name     | O(n log n)      | O(n)             | Stable, divide-and-conquer, consistent   |
+| Algorithm          | Used For       | Time Complexity | Space Complexity | Characteristics                          |
+|--------------------|----------------|-----------------|------------------|------------------------------------------|
+| **Bubble Sort**    | Clubs by name  | O(n²)           | O(1)             | Simple, adaptive (stops early if sorted) |
+| **Selection Sort** | Members by ID  | O(n²)           | O(1)             | Minimizes swaps (at most n swaps)        |
+| **Merge Sort**     | Sports by name | O(n log n)      | O(n)             | Stable, divide-and-conquer, consistent   |
 
 ### Searching Algorithms
 
-| Algorithm       | Used For              | Time Complexity | Prerequisite               |
-|-----------------|-----------------------|-----------------|----------------------------|
-| **Binary Search**| Clubs by name        | O(log n)        | List must be sorted by name |
-| **Binary Search**| Members by ID        | O(log n)        | List must be sorted by ID  |
+| Algorithm         | Used For      | Time Complexity | Prerequisite                |
+|-------------------|---------------|-----------------|-----------------------------|
+| **Binary Search** | Clubs by name | O(log n)        | List must be sorted by name |
+| **Binary Search** | Members by ID | O(log n)        | List must be sorted by ID   |
 
 Both iterative and recursive implementations are provided in `BinarySearch.java`.
 
@@ -77,17 +77,17 @@ Both iterative and recursive implementations are provided in `BinarySearch.java`
 
 ### Individual Operations
 
-| Operation                          | Time Complexity | Space Complexity |
-|------------------------------------|-----------------|------------------|
-| Initialize data                    | O(n)            | O(n)             |
-| Bubble Sort (clubs)                | O(n²)           | O(1)             |
-| Selection Sort (members)           | O(n²)           | O(1)             |
-| Merge Sort (sports)                | O(n log n)      | O(n)             |
-| Binary Search (club/member)        | O(log n)        | O(1) iterative   |
-| Add club/member/sport              | O(1) amortized  | O(1)             |
-| Remove member                      | O(m)            | O(m)             |
-| Find member by ID (linear scan)    | O(c × m)        | O(1)             |
-| Display all data                   | O(n)            | O(1)             |
+| Operation                       | Time Complexity | Space Complexity |
+|---------------------------------|-----------------|------------------|
+| Initialize data                 | O(n)            | O(n)             |
+| Bubble Sort (clubs)             | O(n²)           | O(1)             |
+| Selection Sort (members)        | O(n²)           | O(1)             |
+| Merge Sort (sports)             | O(n log n)      | O(n)             |
+| Binary Search (club/member)     | O(log n)        | O(1) iterative   |
+| Add club/member/sport           | O(1) amortized  | O(1)             |
+| Remove member                   | O(m)            | O(m)             |
+| Find member by ID (linear scan) | O(c × m)        | O(1)             |
+| Display all data                | O(n)            | O(1)             |
 
 > **Note**: `n` = number of elements, `c` = number of clubs, `m` = members per club.
 
@@ -148,8 +148,6 @@ there is a [Folder](Scripts) containing any scripts available, however the one w
 
 ![example](img/example.png)
 
-
-
 see [gradle build](build.gradle.kts) to verify the build process and dependencies
 
 ---
@@ -199,42 +197,21 @@ When you run the application, you'll see the main menu:
 
 ## Sorting Algorithm Comparison
 
-| Criteria          | Bubble Sort | Selection Sort | Merge Sort     |
-|-------------------|-------------|----------------|----------------|
-| **Time (Best)**   | O(n)        | O(n²)          | O(n log n)     |
-| **Time (Average)**| O(n²)       | O(n²)          | O(n log n)     |
-| **Time (Worst)**  | O(n²)       | O(n²)          | O(n log n)     |
-| **Space**         | O(1)        | O(1)           | O(n)           |
-| **Stable?**       | Yes         | No             | Yes            |
-| **Adaptive?**     | Yes         | No             | No             |
-| **Best For**      | Small/nearly sorted data | Minimizing swaps | Large datasets |
+| Criteria           | Bubble Sort              | Selection Sort   | Merge Sort     |
+|--------------------|--------------------------|------------------|----------------|
+| **Time (Best)**    | O(n)                     | O(n²)            | O(n log n)     |
+| **Time (Average)** | O(n²)                    | O(n²)            | O(n log n)     |
+| **Time (Worst)**   | O(n²)                    | O(n²)            | O(n log n)     |
+| **Space**          | O(1)                     | O(1)             | O(n)           |
+| **Stable?**        | Yes                      | No               | Yes            |
+| **Adaptive?**      | Yes                      | No               | No             |
+| **Best For**       | Small/nearly sorted data | Minimizing swaps | Large datasets |
 
 ### When to Use Each
 
 - **Bubble Sort**: Educational purposes, small datasets, or when data is nearly sorted (adaptive optimization kicks in)
 - **Selection Sort**: When memory writes are expensive (guarantees at most n swaps)
 - **Merge Sort**: Large datasets, guaranteed O(n log n) performance, stable sorting required
-
----
-
-## Team Members
-
-| Student ID | Name | Class |
-|------------|------|-------|
-| *Your ID*  | *Your Name* | *Your Class* |
-| *Partner ID* | *Partner Name* | *Partner Class* |
-
----
-
-## Report
-
-See `report.pdf` for the complete project documentation including:
-
-- Detailed system architecture
-- Algorithm walkthroughs with step-by-step examples
-- Full Big-O analysis with mathematical proofs
-- Testing results and edge case handling
-- Screenshots of program execution
 
 ---
 
