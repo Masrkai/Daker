@@ -2,13 +2,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DatabaseHandler.java
- *
- * Handles all SQLite operations for example.db.
- * Reads schema.sql and data.sql on first run to initialize the database.
- * Provides CRUD operations for clubs, members, and sports.
- */
+// Handles all SQLite operations for example.db.
+// Reads schema.sql and data.sql on first run to initialize the database.
+// Provides CRUD operations for clubs, members, and sports.
+
 public class DatabaseHandler {
     private static final String DB_URL = "jdbc:sqlite:example.db";
     private static DatabaseHandler instance;
@@ -20,7 +17,8 @@ public class DatabaseHandler {
     }
 
     public static synchronized DatabaseHandler getInstance() {
-        if (instance == null) instance = new DatabaseHandler();
+        if (instance == null)
+            instance = new DatabaseHandler();
         return instance;
     }
 
@@ -33,12 +31,15 @@ public class DatabaseHandler {
         }
     }
 
-    /** Reads schema.sql and data.sql to build and populate example.db */
+    // Reads schema.sql and data.sql to build and populate example.db
     private void initializeDatabase() {
         try {
             DatabaseMetaData meta = conn.getMetaData();
             ResultSet tables = meta.getTables(null, null, "clubs", null);
-            if (tables.next()) { tables.close(); return; }
+            if (tables.next()) {
+                tables.close();
+                return;
+            }
             tables.close();
 
             executeSqlFile("/db/schema.sql");
@@ -51,12 +52,14 @@ public class DatabaseHandler {
 
     private void executeSqlFile(String resourcePath) {
         try (java.io.InputStream is = getClass().getResourceAsStream(resourcePath)) {
-            if (is == null) throw new java.io.FileNotFoundException("Classpath resource not found: " + resourcePath);
+            if (is == null)
+                throw new java.io.FileNotFoundException("Classpath resource not found: " + resourcePath);
             try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(is))) {
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.trim().startsWith("--") || line.trim().isEmpty()) continue;
+                    if (line.trim().startsWith("--") || line.trim().isEmpty())
+                        continue;
                     sb.append(line);
                     if (line.trim().endsWith(";")) {
                         conn.createStatement().execute(sb.toString());
@@ -69,7 +72,6 @@ public class DatabaseHandler {
         }
     }
 
-    // ==================== CLUBS ====================
 
     public List<ClubSystem.Club> getAllClubs() {
         List<ClubSystem.Club> clubs = new ArrayList<>();
@@ -84,7 +86,9 @@ public class DatabaseHandler {
                 List<ClubSystem.Member> members = getMembersForClub(id);
                 clubs.add(new ClubSystem.Club(name, branches, manager, location, members));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return clubs;
     }
 
@@ -94,8 +98,11 @@ public class DatabaseHandler {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, clubId);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) branches.add(rs.getString("name"));
-        } catch (SQLException e) { e.printStackTrace(); }
+            while (rs.next())
+                branches.add(rs.getString("name"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return branches;
     }
 
@@ -110,7 +117,8 @@ public class DatabaseHandler {
             if (keys.next()) {
                 int clubId = keys.getInt(1);
                 for (String branch : club.branches()) {
-                    try (PreparedStatement ps2 = conn.prepareStatement("INSERT INTO branches (club_id, name) VALUES (?, ?)")) {
+                    try (PreparedStatement ps2 = conn
+                            .prepareStatement("INSERT INTO branches (club_id, name) VALUES (?, ?)")) {
                         ps2.setInt(1, clubId);
                         ps2.setString(2, branch);
                         ps2.executeUpdate();
@@ -118,10 +126,12 @@ public class DatabaseHandler {
                 }
             }
             return true;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    // ==================== MEMBERS ====================
 
     public List<ClubSystem.Member> getAllMembers() {
         List<ClubSystem.Member> members = new ArrayList<>();
@@ -129,13 +139,14 @@ public class DatabaseHandler {
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 members.add(new ClubSystem.Member(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getString("phone"),
-                    rs.getInt("number_of_children")
-                ));
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("phone"),
+                        rs.getInt("number_of_children")));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return members;
     }
 
@@ -147,13 +158,14 @@ public class DatabaseHandler {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 members.add(new ClubSystem.Member(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getString("phone"),
-                    rs.getInt("number_of_children")
-                ));
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("phone"),
+                        rs.getInt("number_of_children")));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return members;
     }
 
@@ -162,11 +174,12 @@ public class DatabaseHandler {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, clubName);
             ResultSet rs = ps.executeQuery();
-            if (!rs.next()) return false;
+            if (!rs.next())
+                return false;
             int clubId = rs.getInt("id");
 
             try (PreparedStatement ps2 = conn.prepareStatement(
-                "INSERT INTO members (id, club_id, name, phone, number_of_children) VALUES (?, ?, ?, ?, ?)")) {
+                    "INSERT INTO members (id, club_id, name, phone, number_of_children) VALUES (?, ?, ?, ?, ?)")) {
                 ps2.setInt(1, member.id());
                 ps2.setInt(2, clubId);
                 ps2.setString(3, member.name());
@@ -175,7 +188,10 @@ public class DatabaseHandler {
                 ps2.executeUpdate();
                 return true;
             }
-        } catch (SQLException e) { e.printStackTrace(); return false; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean removeMemberFromClub(String clubName, int memberId) {
@@ -184,10 +200,11 @@ public class DatabaseHandler {
             ps.setInt(1, memberId);
             ps.setString(2, clubName);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-
-    // ==================== SPORTS ====================
 
     public List<ClubSystem.Sport> getAllSports() {
         List<ClubSystem.Sport> sports = new ArrayList<>();
@@ -195,12 +212,13 @@ public class DatabaseHandler {
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 sports.add(new ClubSystem.Sport(
-                    rs.getString("name"),
-                    rs.getInt("id"),
-                    rs.getInt("number_of_teams")
-                ));
+                        rs.getString("name"),
+                        rs.getInt("id"),
+                        rs.getInt("number_of_teams")));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return sports;
     }
 
@@ -212,33 +230,45 @@ public class DatabaseHandler {
             ps.setInt(3, sport.numberOfTeams());
             ps.executeUpdate();
             return true;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-
-    // ==================== STATS ====================
 
     public int getTotalMemberCount() {
         try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM members")) {
+                ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM members")) {
             return rs.getInt(1);
-        } catch (SQLException e) { return 0; }
+        } catch (SQLException e) {
+            return 0;
+        }
     }
 
     public int getTotalChildren() {
         try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT SUM(number_of_children) FROM members")) {
+                ResultSet rs = stmt.executeQuery("SELECT SUM(number_of_children) FROM members")) {
             return rs.getInt(1);
-        } catch (SQLException e) { return 0; }
+        } catch (SQLException e) {
+            return 0;
+        }
     }
 
     public int getTotalTeams() {
         try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT SUM(number_of_teams) FROM sports")) {
+                ResultSet rs = stmt.executeQuery("SELECT SUM(number_of_teams) FROM sports")) {
             return rs.getInt(1);
-        } catch (SQLException e) { return 0; }
+        } catch (SQLException e) {
+            return 0;
+        }
     }
 
     public void close() {
-        try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+        try {
+            if (conn != null)
+                conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
