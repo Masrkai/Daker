@@ -4,3 +4,5 @@ build
 .gradle
 
 example.db
+
+docs/Current/collected.md

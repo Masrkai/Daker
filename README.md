@@ -6,22 +6,35 @@ Daker is a Java application for managing sports clubs, members, and sports. This
 
 ## Features
 
-- **Club Management**: Create, view, and manage clubs with branches, managers, locations, and member rosters
-- **Member Management**: Add, remove, and search members by ID across all clubs
-- **Sport Management**: Track sports with team counts
-- **Sorting Demonstrations**:
+- **Club Management** – Create, view, and manage clubs with branches, managers, locations, and member rosters.
+- **Member Management** – Add, remove, and search members by ID across all clubs.
+- **Sport Management** – Track sports with team counts.
+- **Sorting Demonstrations**
   - Bubble Sort for clubs by name
   - Selection Sort for members by ID
   - Merge Sort for sports by name
-- **Binary Search**: Efficient O(log n) search for clubs and members (requires sorted data)
-- **Statistics Dashboard**: View system-wide analytics
-- **Performance Timing**: Each operation displays execution time in milliseconds
+- **Binary Search** – Efficient O(log n) search for clubs and members (requires sorted data).
+- **Statistics Dashboard** – View system‑wide analytics.
+- **Performance Timing** – Each operation displays execution time in milliseconds.
+- **Graphical Interface** – Optional Swing GUI (`ClubManagementGUI`) for interactive data exploration.
+- **Database Persistence** – SQLite backend (`example.db`) with full CRUD operations.
 
 ---
 
 ## Project Structure
 
 ![structure](img/structure.png)
+
+| File                    | Purpose |
+|-------------------------|---------|
+| `ClubSystem.java`       | Data records (`Club`, `Member`, `Sport`) and utility functions. |
+| `SortingAlgorithms.java`| Bubble Sort, Selection Sort, Merge Sort implementations. |
+| `BinarySearch.java`     | Iterative & recursive binary search for clubs and members. |
+| `Main.java`             | Console-based menu and control flow. |
+| `ClubManagementGUI.java`| Swing GUI for sorting/searching tables. |
+| `DatabaseHandler.java`  | SQLite Singleton – schema creation, CRUD operations. |
+
+Detailed documentation for each file is available in the [`docs/`](docs/) folder.
 
 ---
 
@@ -39,52 +52,20 @@ Records provide automatic implementations of `equals()`, `hashCode()`, and `toSt
 
 ---
 
-## Algorithms Implemented
+## Algorithms & Complexity
 
-### Sorting Algorithms
+Detailed analysis can be found in the individual source file docs. Here’s a quick reference:
 
-| Algorithm          | Used For       | Time Complexity | Space Complexity | Characteristics                          |
-|--------------------|----------------|-----------------|------------------|------------------------------------------|
-| **Bubble Sort**    | Clubs by name  | O(n²)           | O(1)             | Simple, adaptive (stops early if sorted) |
-| **Selection Sort** | Members by ID  | O(n²)           | O(1)             | Minimizes swaps (at most n swaps)        |
-| **Merge Sort**     | Sports by name | O(n log n)      | O(n)             | Stable, divide-and-conquer, consistent   |
+| Algorithm          | Used for        | Time Complexity | Space Complexity |
+|--------------------|-----------------|-----------------|------------------|
+| Bubble Sort        | Clubs by name   | O(n²)           | O(1)             |
+| Selection Sort     | Members by ID   | O(n²)           | O(1)             |
+| Merge Sort         | Sports by name  | O(n log n)      | O(n)             |
+| Binary Search      | Club/Member     | O(log n)        | O(1) iterative   |
 
-### Searching Algorithms
+## Database Schema
 
-| Algorithm         | Used For      | Time Complexity | Prerequisite                |
-|-------------------|---------------|-----------------|-----------------------------|
-| **Binary Search** | Clubs by name | O(log n)        | List must be sorted by name |
-| **Binary Search** | Members by ID | O(log n)        | List must be sorted by ID   |
-
-Both iterative and recursive implementations are provided in `BinarySearch.java`.
-
----
-
-## Big-O Analysis
-
-### Individual Operations
-
-| Operation                       | Time Complexity | Space Complexity |
-|---------------------------------|-----------------|------------------|
-| Initialize data                 | O(n)            | O(n)             |
-| Bubble Sort (clubs)             | O(n²)           | O(1)             |
-| Selection Sort (members)        | O(n²)           | O(1)             |
-| Merge Sort (sports)             | O(n log n)      | O(n)             |
-| Binary Search (club/member)     | O(log n)        | O(1) iterative   |
-| Add club/member/sport           | O(1) amortized  | O(1)             |
-| Remove member                   | O(m)            | O(m)             |
-| Find member by ID (linear scan) | O(c × m)        | O(1)             |
-| Display all data                | O(n)            | O(1)             |
-
-> **Note**: `n` = number of elements, `c` = number of clubs, `m` = members per club.
-
-### Overall Program Complexity
-
-The dominant operation is **sorting**. For the overall program:
-
-- **Worst case**: O(n²) when using Bubble Sort or Selection Sort on large datasets
-- **Best case**: O(n log n) when Merge Sort is the primary sorting operation
-- **Recommendation**: For production use with large datasets, prefer Merge Sort or use Java's built-in `Collections.sort()` (Timsort, O(n log n)).
+The SQLite database contains four tables: `clubs`, `branches`, `members`, `sports`, and a join table `club_sports`. See the full PlantUML diagram in [`docs/DatabaseSchema.md`](docs/DatabaseSchema.md).
 
 ---
 
@@ -179,26 +160,6 @@ When you run the application, you'll see the main menu:
 **View System Statistics:**
 
 1. Select option `11` to see total counts, averages, and algorithm summaries
-
----
-
-## Sorting Algorithm Comparison
-
-| Criteria           | Bubble Sort              | Selection Sort   | Merge Sort     |
-|--------------------|--------------------------|------------------|----------------|
-| **Time (Best)**    | O(n)                     | O(n²)            | O(n log n)     |
-| **Time (Average)** | O(n²)                    | O(n²)            | O(n log n)     |
-| **Time (Worst)**   | O(n²)                    | O(n²)            | O(n log n)     |
-| **Space**          | O(1)                     | O(1)             | O(n)           |
-| **Stable?**        | Yes                      | No               | Yes            |
-| **Adaptive?**      | Yes                      | No               | No             |
-| **Best For**       | Small/nearly sorted data | Minimizing swaps | Large datasets |
-
-### When to Use Each
-
-- **Bubble Sort**: Educational purposes, small datasets, or when data is nearly sorted (adaptive optimization kicks in)
-- **Selection Sort**: When memory writes are expensive (guarantees at most n swaps)
-- **Merge Sort**: Large datasets, guaranteed O(n log n) performance, stable sorting required
 
 ---
 
