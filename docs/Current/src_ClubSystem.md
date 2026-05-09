@@ -11,26 +11,26 @@ Defines the core data structures using Java records and provides utility methods
 
 ## Factory Methods
 
-| Method | Description |
-|--------|-------------|
-| `initializeClubs()` | Creates five sample clubs (Lions, Tigers, Eagles, Sharks, Bears) with predefined members. |
-| `initializeMembers()` | Returns a flat list of all sample members across clubs. |
-| `initializeSports()` | Returns seven sports (Basketball, Football, Swimming, …). |
+| Method                | Description                                                                               |
+|-----------------------|-------------------------------------------------------------------------------------------|
+| `initializeClubs()`   | Creates five sample clubs (Lions, Tigers, Eagles, Sharks, Bears) with predefined members. |
+| `initializeMembers()` | Returns a flat list of all sample members across clubs.                                   |
+| `initializeSports()`  | Returns seven sports (Basketball, Football, Swimming, …).                                 |
 
 ## Utility Functions
 
-| Function | Complexity | Description |
-|----------|------------|-------------|
-| `displayClubs(List<Club>)` | O(n) | Prints formatted club details. |
-| `displayMembers(List<Member>)` | O(n) | Prints member list. |
-| `displaySports(List<Sport>)` | O(n) | Prints sport list. |
-| `addMemberToClub(List<Club>, String clubName, Member)` | O(c) | Adds a member to a club (creates a new immutable `Club` instance). |
-| `addClub(List<Club>, Club)` | O(1) | Appends a new club. |
-| `addSport(List<Sport>, Sport)` | O(1) | Appends a new sport. |
-| `removeMemberFromClub(List<Club>, String clubName, int memberId)` | O(c + m) | Removes a member from the matching club. |
-| `findMemberById(List<Club>, int memberId)` | O(c × m) | Searches all clubs for a member. |
-| `getTotalMemberCount(List<Club>)` | O(c) | Sums member counts. |
-| `getAllMembers(List<Club>)` | O(c × m) | Flattens all club members into one list. |
+| Function                                                          | Complexity | Description                                                        |
+|-------------------------------------------------------------------|------------|--------------------------------------------------------------------|
+| `displayClubs(List<Club>)`                                        | O(n)       | Prints formatted club details.                                     |
+| `displayMembers(List<Member>)`                                    | O(n)       | Prints member list.                                                |
+| `displaySports(List<Sport>)`                                      | O(n)       | Prints sport list.                                                 |
+| `addMemberToClub(List<Club>, String clubName, Member)`            | O(c)       | Adds a member to a club (creates a new immutable `Club` instance). |
+| `addClub(List<Club>, Club)`                                       | O(1)       | Appends a new club.                                                |
+| `addSport(List<Sport>, Sport)`                                    | O(1)       | Appends a new sport.                                               |
+| `removeMemberFromClub(List<Club>, String clubName, int memberId)` | O(c + m)   | Removes a member from the matching club.                           |
+| `findMemberById(List<Club>, int memberId)`                        | O(c × m)   | Searches all clubs for a member.                                   |
+| `getTotalMemberCount(List<Club>)`                                 | O(c)       | Sums member counts.                                                |
+| `getAllMembers(List<Club>)`                                       | O(c × m)   | Flattens all club members into one list.                           |
 
 These functions are used by the CLI (`Main.java`) when the database is not involved. The GUI and `Main.java` with the database use the real persistence layer (`DatabaseHandler`).
 

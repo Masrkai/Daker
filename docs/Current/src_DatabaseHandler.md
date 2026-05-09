@@ -14,19 +14,19 @@ Singleton class that manages all SQLite operations for `example.db`. It automati
 
 ## Public Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `getAllClubs()` | `List<Club>` | Fetches clubs with branches and members. |
-| `addClub(Club)` | `boolean` | Inserts club and its branches. |
-| `getAllMembers()` | `List<Member>` | Returns all members (regardless of club). |
-| `addMemberToClub(String clubName, Member)` | `boolean` | Inserts a member linked to a club. |
-| `removeMemberFromClub(String clubName, int memberId)` | `boolean` | Deletes the member. |
-| `getAllSports()` | `List<Sport>` | Retrieves all sports. |
-| `addSport(Sport)` | `boolean` | Inserts a sport. |
-| `getTotalMemberCount()` | `int` | Aggregate query `COUNT(*)`. |
-| `getTotalChildren()` | `int` | `SUM(number_of_children)`. |
-| `getTotalTeams()` | `int` | `SUM(number_of_teams)`. |
-| `close()` | void | Closes the connection. |
+| Method                                                | Returns        | Description                               |
+|-------------------------------------------------------|----------------|-------------------------------------------|
+| `getAllClubs()`                                       | `List<Club>`   | Fetches clubs with branches and members.  |
+| `addClub(Club)`                                       | `boolean`      | Inserts club and its branches.            |
+| `getAllMembers()`                                     | `List<Member>` | Returns all members (regardless of club). |
+| `addMemberToClub(String clubName, Member)`            | `boolean`      | Inserts a member linked to a club.        |
+| `removeMemberFromClub(String clubName, int memberId)` | `boolean`      | Deletes the member.                       |
+| `getAllSports()`                                      | `List<Sport>`  | Retrieves all sports.                     |
+| `addSport(Sport)`                                     | `boolean`      | Inserts a sport.                          |
+| `getTotalMemberCount()`                               | `int`          | Aggregate query `COUNT(*)`.               |
+| `getTotalChildren()`                                  | `int`          | `SUM(number_of_children)`.                |
+| `getTotalTeams()`                                     | `int`          | `SUM(number_of_teams)`.                   |
+| `close()`                                             | void           | Closes the connection.                    |
 
 ## Design
 

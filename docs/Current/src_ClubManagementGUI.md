@@ -13,13 +13,13 @@ A Swing‑based graphical interface that displays clubs, members, and sports in 
 
 ## Controls
 
-| Tab      | Buttons | Action |
-|----------|---------|--------|
-| Clubs    | "Sort by Name (Bubble Sort)" | Sorts the clubs list in‑place and refreshes the table. |
-|          | "Search by Name (Binary Search)" | Sorts first, then prompts for a name; shows result in a dialog. |
-| Members  | "Sort by ID (Selection Sort)" | Sorts members by ID. |
-|          | "Search by ID (Binary Search)" | Sorts first, prompts for an ID, displays the found member. |
-| Sports   | "Sort by Name (Merge Sort)" | Sorts sports and updates the table. |
+| Tab     | Buttons                          | Action                                                          |
+|---------|----------------------------------|-----------------------------------------------------------------|
+| Clubs   | "Sort by Name (Bubble Sort)"     | Sorts the clubs list in‑place and refreshes the table.          |
+|         | "Search by Name (Binary Search)" | Sorts first, then prompts for a name; shows result in a dialog. |
+| Members | "Sort by ID (Selection Sort)"    | Sorts members by ID.                                            |
+|         | "Search by ID (Binary Search)"   | Sorts first, prompts for an ID, displays the found member.      |
+| Sports  | "Sort by Name (Merge Sort)"      | Sorts sports and updates the table.                             |
 
 ## Important Notes
 
