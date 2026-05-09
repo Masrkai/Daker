@@ -1,3 +1,4 @@
+
 # ClubSystem.java
 
 Defines the core data structures using Java records and provides utility methods for initialisation and in‑memory list manipulation.
@@ -35,3 +36,5 @@ Defines the core data structures using Java records and provides utility methods
 These functions are used by the CLI (`Main.java`) when the database is not involved. The GUI and `Main.java` with the database use the real persistence layer (`DatabaseHandler`).
 
 > **Note:** All mutation functions work with immutable records by creating new instances and replacing the original in the list.
+
+\newpage

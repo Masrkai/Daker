@@ -30,3 +30,6 @@ In the application, the appropriate sorting algorithm is called automatically be
 - Member search → `selectionSortMembers(members)`
 
 This ensures the prerequisite is always met.
+
+
+\newpage

@@ -4,7 +4,7 @@ The SQLite database `example.db` contains four core tables plus an association t
 
 ## PlantUML Diagram
 
-![graph](../../img/DB_schema.svg)
+![graph](DB_schema.svg)
 
 ## Table Descriptions
 
@@ -41,3 +41,5 @@ The SQLite database `example.db` contains four core tables plus an association t
 
 - **`schema.sql`**: Contains `CREATE TABLE IF NOT EXISTS` statements for all tables.
 - **`data.sql`**: Inserts sample clubs, branches, members, sports, and club‑sport associations.
+
+\newpage

@@ -43,3 +43,5 @@ The class also offers generic methods that accept a `Comparator<? super T>`:
 | `mergeSort(List<T>, Comparator)`     | Returns a new sorted list, stable. |
 
 These can be used for custom sorting beyond the predefined use cases.
+
+\newpage

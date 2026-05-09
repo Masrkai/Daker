@@ -33,3 +33,5 @@ Singleton class that manages all SQLite operations for `example.db`. It automati
 - Uses **Prepared Statements** to prevent SQL injection.
 - The Singleton pattern ensures only one database connection is used throughout the application.
 - The `club_sports` table is created but currently not exposed via any public method (exists for future use).
+
+\newpage
