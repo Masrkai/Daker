@@ -1,17 +1,12 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClubManagementGUI extends JFrame {
 
-    // Persistence Files
-    private final String CLUBS_FILE = "clubs_data.dat";
-    private final String MEMBERS_FILE = "members_data.dat";
-    private final String SPORTS_FILE = "sports_data.dat";
-
+    private final ClubManagementService service = new ClubManagementService();
     private List<ClubSystem.Club> clubs;
     private List<ClubSystem.Member> allMembers;
     private List<ClubSystem.Sport> sports;
@@ -20,18 +15,18 @@ public class ClubManagementGUI extends JFrame {
     private DefaultTableModel clubModel, memberModel, sportModel;
 
     public ClubManagementGUI() {
-        loadData(); // Load data from files on startup
+        loadDataFromService();
 
         setTitle("Club Management System");
-        setSize(1100, 750);
+        setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Header Style
+        // Header
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(41, 128, 185)); // Blue Header
-        headerPanel.setPreferredSize(new Dimension(1100, 65));
+        headerPanel.setBackground(new Color(41, 128, 185));
+        headerPanel.setPreferredSize(new Dimension(1200, 65));
         JLabel headerLabel = new JLabel("CLUB MANAGEMENT SYSTEM");
         headerLabel.setForeground(Color.WHITE);
         headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
@@ -45,200 +40,297 @@ public class ClubManagementGUI extends JFrame {
         tabbedPane.addTab("Sports", createSportPanel());
         add(tabbedPane, BorderLayout.CENTER);
 
+        // Statistics button
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton statsBtn = createStyledButton("Show Statistics");
+        statsBtn.addActionListener(e -> displayStatistics());
+        bottomPanel.add(statsBtn);
+        add(bottomPanel, BorderLayout.SOUTH);
+
         refreshTables();
     }
 
-    // --- CLUBS PANEL (Full Functionality) ---
+    // ------------------------------------------------------------
+    // Club Panel
+    // ------------------------------------------------------------
     private JPanel createClubPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        String[] columns = { "Club Name", "Manager", "Location", "Branches Count", "Members Count" };
+        String[] columns = { "Club Name", "Manager", "Location", "Members Count" };
         clubModel = new DefaultTableModel(columns, 0);
         clubTable = new JTable(clubModel);
-        
+
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        
-        JButton addBtn = createStyledButton("Add"); 
-        JButton delBtn = createStyledButton("Delete");
+        JButton addClubBtn = createStyledButton("Add Club");
         JButton sortBtn = createStyledButton("Sort (Bubble)");
-        JButton searchBtn = createStyledButton("Search (Binary)");
+        JButton searchBtn = createStyledButton("Search Club");
+        JButton addMemberBtn = createStyledButton("Add Member to Club");
+        JButton removeMemberBtn = createStyledButton("Remove Member");
 
-        addBtn.addActionListener(e -> {
-            JTextField nameF = new JTextField(), managerF = new JTextField(), locF = new JTextField();
-            Object[] msg = { "Club Name:", nameF, "Manager:", managerF, "Location:", locF };
-            if (JOptionPane.showConfirmDialog(null, msg, "Add New Club", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                if(!nameF.getText().isEmpty()){
-                    clubs.add(new ClubSystem.Club(nameF.getText(), new ArrayList<>(), managerF.getText(), locF.getText(), new ArrayList<>()));
-                    saveData(); refreshTables();
-                }
-            }
-        });
+        addClubBtn.addActionListener(e -> addNewClub());
+        sortBtn.addActionListener(e -> sortClubs());
+        searchBtn.addActionListener(e -> searchClub());
+        addMemberBtn.addActionListener(e -> addMemberToClub());
+        removeMemberBtn.addActionListener(e -> removeMemberFromClub());
 
-        delBtn.addActionListener(e -> {
-            int row = clubTable.getSelectedRow();
-            if (row != -1) {
-                clubs.remove(row); saveData(); refreshTables();
-            } else {
-                JOptionPane.showMessageDialog(this, "Please select a row to delete.");
-            }
-        });
+        controlPanel.add(addClubBtn);
+        controlPanel.add(sortBtn);
+        controlPanel.add(searchBtn);
+        controlPanel.add(addMemberBtn);
+        controlPanel.add(removeMemberBtn);
 
-        sortBtn.addActionListener(e -> {
-            SortingAlgorithms.bubbleSortClubs(clubs);
-            saveData(); refreshTables();
-            JOptionPane.showMessageDialog(this, "Clubs sorted alphabetically.");
-        });
-
-        searchBtn.addActionListener(e -> {
-            if (clubs.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "List is empty.");
-                return;
-            }
-            SortingAlgorithms.bubbleSortClubs(clubs); // Must sort before binary search
-            String name = JOptionPane.showInputDialog("Enter Club Name to find:");
-            if (name != null && !name.isEmpty()) {
-                ClubSystem.Club result = BinarySearch.binarySearchClub(clubs, name);
-                if (result != null) {
-                    JOptionPane.showMessageDialog(this, "Found: " + result.name() + "\nManager: " + result.manager() + "\nLocation: " + result.location());
-                } else {
-                    JOptionPane.showMessageDialog(this, "Club not found.");
-                }
-            }
-        });
-
-        controlPanel.add(addBtn); controlPanel.add(delBtn); controlPanel.add(sortBtn); controlPanel.add(searchBtn);
         panel.add(new JScrollPane(clubTable), BorderLayout.CENTER);
         panel.add(controlPanel, BorderLayout.SOUTH);
         return panel;
     }
 
-    // --- MEMBERS PANEL (Full Functionality) ---
+    private void addNewClub() {
+        JTextField nameF = new JTextField(), managerF = new JTextField(), locF = new JTextField();
+        Object[] msg = { "Club Name:", nameF, "Manager:", managerF, "Location:", locF };
+        if (JOptionPane.showConfirmDialog(this, msg, "Add New Club", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            if (!nameF.getText().isEmpty()) {
+                if (service.addClub(nameF.getText(), managerF.getText(), locF.getText())) {
+                    loadDataFromService();
+                    refreshTables();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to add club.");
+                }
+            }
+        }
+    }
+
+    private void sortClubs() {
+        SortingAlgorithms.bubbleSortClubs(clubs);
+        refreshTables();
+        JOptionPane.showMessageDialog(this, "Clubs sorted alphabetically.");
+    }
+
+    private void searchClub() {
+        if (clubs.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Club list empty.");
+            return;
+        }
+        SortingAlgorithms.bubbleSortClubs(clubs);
+        String name = JOptionPane.showInputDialog("Enter club name:");
+        if (name != null && !name.isEmpty()) {
+            ClubSystem.Club result = BinarySearch.binarySearchClub(clubs, name);
+            if (result != null) {
+                JOptionPane.showMessageDialog(this,
+                        "Found: " + result.name() + "\nManager: " + result.manager() + "\nLocation: " + result.location());
+            } else {
+                JOptionPane.showMessageDialog(this, "Club not found.");
+            }
+        }
+    }
+
+    private void addMemberToClub() {
+        int row = clubTable.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Select a club first.");
+            return;
+        }
+        String clubName = (String) clubModel.getValueAt(row, 0);
+        JTextField idF = new JTextField(), nameF = new JTextField(), phoneF = new JTextField(), childF = new JTextField();
+        Object[] msg = { "Member ID:", idF, "Name:", nameF, "Phone:", phoneF, "Children:", childF };
+        if (JOptionPane.showConfirmDialog(this, msg, "Add Member to " + clubName, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            try {
+                int id = Integer.parseInt(idF.getText());
+                int children = Integer.parseInt(childF.getText());
+                if (service.addMemberToClub(clubName, id, nameF.getText(), phoneF.getText(), children)) {
+                    loadDataFromService();
+                    refreshTables();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to add member.");
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "ID and Children must be numbers.");
+            }
+        }
+    }
+
+    private void removeMemberFromClub() {
+        int row = clubTable.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Select a club first.");
+            return;
+        }
+        String clubName = (String) clubModel.getValueAt(row, 0);
+        String input = JOptionPane.showInputDialog("Enter member ID to remove:");
+        if (input != null && !input.isEmpty()) {
+            try {
+                int id = Integer.parseInt(input);
+                if (service.removeMemberFromClub(clubName, id)) {
+                    loadDataFromService();
+                    refreshTables();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Member not found or club doesn't exist.");
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid ID.");
+            }
+        }
+    }
+
+    // ------------------------------------------------------------
+    // Member Panel (global view + search)
+    // ------------------------------------------------------------
     private JPanel createMemberPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         String[] columns = { "ID", "Name", "Phone", "Children" };
         memberModel = new DefaultTableModel(columns, 0);
         memberTable = new JTable(memberModel);
-        
+
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        JButton addBtn = createStyledButton("Add"); 
-        JButton delBtn = createStyledButton("Delete");
-        JButton sortBtn = createStyledButton("Sort (Selection)");
-
-        addBtn.addActionListener(e -> {
-            JTextField idF = new JTextField(), nameF = new JTextField(), phoneF = new JTextField(), childF = new JTextField();
-            Object[] msg = { "ID:", idF, "Name:", nameF, "Phone:", phoneF, "Children:", childF };
-            if (JOptionPane.showConfirmDialog(null, msg, "Add Member", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                try {
-                    allMembers.add(new ClubSystem.Member(Integer.parseInt(idF.getText()), nameF.getText(), phoneF.getText(), Integer.parseInt(childF.getText())));
-                    saveData(); refreshTables();
-                } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Error: ID and Children must be numbers."); }
-            }
-        });
-
-        delBtn.addActionListener(e -> {
-            int row = memberTable.getSelectedRow();
-            if (row != -1) { allMembers.remove(row); saveData(); refreshTables(); }
-        });
+        JButton sortBtn = createStyledButton("Sort by ID");
+        JButton searchBtn = createStyledButton("Search by ID");
+        JButton refreshBtn = createStyledButton("Refresh");
 
         sortBtn.addActionListener(e -> {
             SortingAlgorithms.selectionSortMembers(allMembers);
-            saveData(); refreshTables();
+            refreshTables();
+        });
+        searchBtn.addActionListener(e -> searchMemberById());
+        refreshBtn.addActionListener(e -> {
+            loadDataFromService();
+            refreshTables();
         });
 
-        controlPanel.add(addBtn); controlPanel.add(delBtn); controlPanel.add(sortBtn);
+        controlPanel.add(sortBtn); controlPanel.add(searchBtn); controlPanel.add(refreshBtn);
         panel.add(new JScrollPane(memberTable), BorderLayout.CENTER);
         panel.add(controlPanel, BorderLayout.SOUTH);
         return panel;
     }
 
-    // --- SPORTS PANEL (Full Functionality) ---
+    private void searchMemberById() {
+        if (allMembers.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No members.");
+            return;
+        }
+        SortingAlgorithms.selectionSortMembers(allMembers);
+        String input = JOptionPane.showInputDialog("Enter member ID:");
+        if (input != null && !input.isEmpty()) {
+            try {
+                int id = Integer.parseInt(input);
+                ClubSystem.Member m = BinarySearch.binarySearchMember(allMembers, id);
+                if (m != null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Found: " + m.name() + " (ID: " + m.id() + ")\nPhone: " + m.phone() +
+                            "\nChildren: " + m.numberOfChildren());
+                } else {
+                    JOptionPane.showMessageDialog(this, "Member not found.");
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid ID.");
+            }
+        }
+    }
+
+    // ------------------------------------------------------------
+    // Sport Panel
+    // ------------------------------------------------------------
     private JPanel createSportPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         String[] columns = { "ID", "Sport Name", "Teams" };
         sportModel = new DefaultTableModel(columns, 0);
         sportTable = new JTable(sportModel);
-        
+
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        JButton addBtn = createStyledButton("Add"); 
-        JButton delBtn = createStyledButton("Delete");
+        JButton addBtn = createStyledButton("Add Sport");
         JButton sortBtn = createStyledButton("Sort (Merge)");
 
-        addBtn.addActionListener(e -> {
-            JTextField idF = new JTextField(), nameF = new JTextField(), teamF = new JTextField();
-            Object[] msg = { "Sport ID:", idF, "Sport Name:", nameF, "Teams Count:", teamF };
-            if (JOptionPane.showConfirmDialog(null, msg, "Add Sport", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-                try {
-                    sports.add(new ClubSystem.Sport(nameF.getText(), Integer.parseInt(idF.getText()), Integer.parseInt(teamF.getText())));
-                    saveData(); refreshTables();
-                } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Input Error!"); }
-            }
-        });
-
-        delBtn.addActionListener(e -> {
-            int row = sportTable.getSelectedRow();
-            if (row != -1) { sports.remove(row); saveData(); refreshTables(); }
-        });
-
+        addBtn.addActionListener(e -> addSport());
         sortBtn.addActionListener(e -> {
             sports = SortingAlgorithms.mergeSortSports(new ArrayList<>(sports));
-            saveData(); refreshTables();
+            refreshTables();
         });
 
-        controlPanel.add(addBtn); controlPanel.add(delBtn); controlPanel.add(sortBtn);
+        controlPanel.add(addBtn); controlPanel.add(sortBtn);
         panel.add(new JScrollPane(sportTable), BorderLayout.CENTER);
         panel.add(controlPanel, BorderLayout.SOUTH);
         return panel;
     }
 
-    // --- HELPER: BUTTON STYLING (Visible Black Text) ---
+    private void addSport() {
+        JTextField idF = new JTextField(), nameF = new JTextField(), teamF = new JTextField();
+        Object[] msg = { "Sport ID:", idF, "Name:", nameF, "Teams:", teamF };
+        if (JOptionPane.showConfirmDialog(this, msg, "Add Sport", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            try {
+                int id = Integer.parseInt(idF.getText());
+                int teams = Integer.parseInt(teamF.getText());
+                if (service.addSport(nameF.getText(), id, teams)) {
+                    loadDataFromService();
+                    refreshTables();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to add sport.");
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "ID and Teams must be numbers.");
+            }
+        }
+    }
+
+    // ------------------------------------------------------------
+    // Statistics
+    // ------------------------------------------------------------
+    private void displayStatistics() {
+        ClubManagementService.SystemStatistics stats = service.getStatistics();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SYSTEM STATISTICS\n\n");
+        sb.append("Total Clubs:   ").append(stats.totalClubs()).append("\n");
+        sb.append("Total Members: ").append(stats.totalMembers()).append("\n");
+        sb.append("Total Sports:  ").append(stats.totalSports()).append("\n");
+        sb.append("Total Children: ").append(stats.totalChildren()).append("\n");
+        sb.append(String.format("Avg Children/Member: %.2f\n", stats.avgChildrenPerMember()));
+        sb.append("Total Teams: ").append(stats.totalTeams()).append("\n");
+        sb.append(String.format("Avg Teams/Sport: %.2f\n", stats.avgTeamsPerSport()));
+        sb.append("\nAlgorithm Summary:\n");
+        sb.append("Bubble Sort (Clubs): O(n²) time, O(1) space\n");
+        sb.append("Selection Sort (Members): O(n²) time, O(1) space\n");
+        sb.append("Merge Sort (Sports): O(n log n) time, O(n) space\n");
+        sb.append("Binary Search: O(log n) time, O(1) space\n");
+
+        JTextArea textArea = new JTextArea(sb.toString());
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(450, 350));
+        JOptionPane.showMessageDialog(this, scrollPane, "Statistics", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // ------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------
     private JButton createStyledButton(String text) {
         JButton btn = new JButton(text);
-        btn.setPreferredSize(new Dimension(140, 35));
+        btn.setPreferredSize(new Dimension(160, 35));
         btn.setFont(new Font("Arial", Font.BOLD, 12));
-        btn.setForeground(Color.BLACK); // Explicitly Black Text
-        btn.setBackground(new Color(225, 225, 225)); // Classic Light Gray
+        btn.setForeground(Color.BLACK);
+        btn.setBackground(new Color(225, 225, 225));
         btn.setFocusPainted(false);
         return btn;
     }
 
-    // --- PERSISTENCE: SAVE/LOAD ---
-    private void saveData() {
-        try {
-            writeObject(CLUBS_FILE, clubs);
-            writeObject(MEMBERS_FILE, allMembers);
-            writeObject(SPORTS_FILE, sports);
-        } catch (IOException e) { e.printStackTrace(); }
-    }
-
-    private void writeObject(String file, Object obj) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-        oos.writeObject(obj); oos.close();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void loadData() {
-        try {
-            clubs = (new File(CLUBS_FILE).exists()) ? (List<ClubSystem.Club>) readObject(CLUBS_FILE) : new ArrayList<>(ClubSystem.initializeClubs());
-            allMembers = (new File(MEMBERS_FILE).exists()) ? (List<ClubSystem.Member>) readObject(MEMBERS_FILE) : new ArrayList<>(ClubSystem.initializeMembers());
-            sports = (new File(SPORTS_FILE).exists()) ? (List<ClubSystem.Sport>) readObject(SPORTS_FILE) : new ArrayList<>(ClubSystem.initializeSports());
-        } catch (Exception e) {
-            clubs = new ArrayList<>(ClubSystem.initializeClubs());
-            allMembers = new ArrayList<>(ClubSystem.initializeMembers());
-            sports = new ArrayList<>(ClubSystem.initializeSports());
-        }
-    }
-
-    private Object readObject(String file) throws Exception {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-        Object obj = ois.readObject(); ois.close(); return obj;
+    private void loadDataFromService() {
+        clubs = service.getAllClubs();
+        allMembers = service.getAllMembers();
+        sports = service.getAllSports();
     }
 
     private void refreshTables() {
+        // Clubs
         clubModel.setRowCount(0);
-        for (ClubSystem.Club c : clubs) clubModel.addRow(new Object[]{c.name(), c.manager(), c.location(), c.branches().size(), c.members().size()});
+        for (ClubSystem.Club c : clubs)
+            clubModel.addRow(new Object[]{c.name(), c.manager(), c.location(), c.members().size()});
+
+        // Members
         memberModel.setRowCount(0);
-        for (ClubSystem.Member m : allMembers) memberModel.addRow(new Object[]{m.id(), m.name(), m.phone(), m.numberOfChildren()});
+        for (ClubSystem.Member m : allMembers)
+            memberModel.addRow(new Object[]{m.id(), m.name(), m.phone(), m.numberOfChildren()});
+
+        // Sports
         sportModel.setRowCount(0);
-        for (ClubSystem.Sport s : sports) sportModel.addRow(new Object[]{s.id(), s.name(), s.numberOfTeams()});
+        for (ClubSystem.Sport s : sports)
+            sportModel.addRow(new Object[]{s.id(), s.name(), s.numberOfTeams()});
     }
 
     public static void main(String[] args) {

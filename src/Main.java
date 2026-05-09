@@ -5,33 +5,30 @@ import java.util.Scanner;
 /**
  * Main.java
  *
- * Entry point for the Club Management System.
- * Uses DatabaseHandler for all data persistence.
+ * Command-line interface for the Club Management System.
+ * All business logic is delegated to ClubManagementService.
  */
 public class Main {
 
     private static final Scanner scanner = new Scanner(System.in);
-    private static final DatabaseHandler db = DatabaseHandler.getInstance();
+    private static final ClubManagementService service = new ClubManagementService();
 
     public static void main(String[] args) {
         System.out.println("=".repeat(60));
         System.out.println("     WELCOME TO THE CLUB MANAGEMENT SYSTEM");
         System.out.println("=".repeat(60));
 
-        // Initialize data from database
-        List<ClubSystem.Club> clubs = db.getAllClubs();
-        List<ClubSystem.Member> members = db.getAllMembers();
-        List<ClubSystem.Sport> sports = db.getAllSports();
+        // Load initial data
+        List<ClubSystem.Club> clubs = service.getAllClubs();
+        List<ClubSystem.Member> members = service.getAllMembers();
+        List<ClubSystem.Sport> sports = service.getAllSports();
 
         boolean running = true;
-
         while (running) {
             printMainMenu();
             System.out.print("\nEnter your choice: ");
-
             String input = scanner.nextLine().trim();
             int choice;
-
             try {
                 choice = Integer.parseInt(input);
             } catch (NumberFormatException e) {
@@ -40,20 +37,39 @@ public class Main {
             }
 
             switch (choice) {
-                case 1 -> displayAllData(clubs, members, sports);
+                case 1 -> {
+                    clubs = service.getAllClubs();
+                    members = service.getAllMembers();
+                    sports = service.getAllSports();
+                    displayAllData(clubs, members, sports);
+                }
                 case 2 -> sortAndDisplayClubs(clubs);
                 case 3 -> sortAndDisplayMembers(members);
                 case 4 -> sortAndDisplaySports(sports);
                 case 5 -> searchClubByName(clubs);
                 case 6 -> searchMemberById(members);
-                case 7 -> addNewClub(clubs);
-                case 8 -> addNewMember(clubs);
-                case 9 -> addNewSport(sports);
-                case 10 -> removeMember(clubs);
+                case 7 -> {
+                    addNewClub(clubs);
+                    clubs = service.getAllClubs(); // refresh after addition
+                }
+                case 8 -> {
+                    addNewMember(clubs);
+                    clubs = service.getAllClubs(); // refresh to show new member
+                    members = service.getAllMembers();
+                }
+                case 9 -> {
+                    addNewSport(sports);
+                    sports = service.getAllSports();
+                }
+                case 10 -> {
+                    removeMember(clubs);
+                    clubs = service.getAllClubs();
+                    members = service.getAllMembers();
+                }
                 case 11 -> displayStatistics(clubs, members, sports);
                 case 0 -> {
                     running = false;
-                    db.close();
+                    DatabaseHandler.getInstance().close();
                     System.out.println("\nThank you for using the Club Management System. Goodbye!");
                 }
                 default -> System.out.println("\nInvalid choice. Please try again.");
@@ -64,13 +80,8 @@ public class Main {
                 scanner.nextLine();
             }
         }
-
         scanner.close();
     }
-
-    // ============================
-    // MENU DISPLAY
-    // ============================
 
     private static void printMainMenu() {
         System.out.println("\n" + "=".repeat(50));
@@ -91,17 +102,12 @@ public class Main {
         System.out.println("=".repeat(50));
     }
 
-    // ============================
-    // DISPLAY OPERATIONS
-    // ============================
-
     private static void displayAllData(List<ClubSystem.Club> clubs,
-            List<ClubSystem.Member> members,
-            List<ClubSystem.Sport> sports) {
+                                       List<ClubSystem.Member> members,
+                                       List<ClubSystem.Sport> sports) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("              DISPLAYING ALL DATA");
         System.out.println("=".repeat(60));
-
         ClubSystem.displayClubs(clubs);
         System.out.println();
         ClubSystem.displayMembers(members);
@@ -109,181 +115,121 @@ public class Main {
         ClubSystem.displaySports(sports);
     }
 
-    // ============================
-    // SORTING OPERATIONS
-    // ============================
-
+    // --- Sorting (still calling algorithm classes directly, no duplication to remove) ---
     private static void sortAndDisplayClubs(List<ClubSystem.Club> clubs) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("       SORTING CLUBS BY NAME (Bubble Sort)");
         System.out.println("=".repeat(60));
-        System.out.println("Algorithm: Bubble Sort");
-        System.out.println("Time Complexity: O(n²) worst/average, O(n) best");
-        System.out.println("Space Complexity: O(1)");
-        System.out.println("Description: Repeatedly steps through the list, compares");
-        System.out.println("adjacent elements and swaps them if they are in wrong order.");
-        System.out.println("-".repeat(60));
+        printAlgorithmInfo("Bubble Sort", "O(n²) worst/average, O(n) best", "O(1)",
+                "Repeatedly steps through list, compares adjacent elements and swaps them if wrong order.");
 
         System.out.println("\n--- Before Sorting ---");
-        for (ClubSystem.Club club : clubs) {
-            System.out.println("  " + club.name());
-        }
+        clubs.forEach(c -> System.out.println("  " + c.name()));
 
-        long startTime = System.nanoTime();
+        long start = System.nanoTime();
         SortingAlgorithms.bubbleSortClubs(clubs);
-        long endTime = System.nanoTime();
+        long end = System.nanoTime();
 
         System.out.println("\n--- After Sorting ---");
-        for (ClubSystem.Club club : clubs) {
-            System.out.println("  " + club.name());
-        }
-
-        double durationMs = (endTime - startTime) / 1_000_000.0;
-        System.out.printf("%nSorting completed in %.3f ms%n", durationMs);
+        clubs.forEach(c -> System.out.println("  " + c.name()));
+        System.out.printf("%nSorting completed in %.3f ms%n", (end - start) / 1_000_000.0);
     }
 
     private static void sortAndDisplayMembers(List<ClubSystem.Member> members) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("       SORTING MEMBERS BY ID (Selection Sort)");
         System.out.println("=".repeat(60));
-        System.out.println("Algorithm: Selection Sort");
-        System.out.println("Time Complexity: O(n²) all cases");
-        System.out.println("Space Complexity: O(1)");
-        System.out.println("Description: Divides list into sorted and unsorted portions,");
-        System.out.println("repeatedly selects the minimum element from unsorted portion.");
-        System.out.println("-".repeat(60));
+        printAlgorithmInfo("Selection Sort", "O(n²) all cases", "O(1)",
+                "Divides list into sorted/unsorted portions, repeatedly selects minimum.");
 
         System.out.println("\n--- Before Sorting ---");
-        for (ClubSystem.Member member : members) {
-            System.out.println("  ID: " + member.id() + " - " + member.name());
-        }
+        members.forEach(m -> System.out.println("  ID: " + m.id() + " - " + m.name()));
 
-        long startTime = System.nanoTime();
+        long start = System.nanoTime();
         SortingAlgorithms.selectionSortMembers(members);
-        long endTime = System.nanoTime();
+        long end = System.nanoTime();
 
         System.out.println("\n--- After Sorting ---");
-        for (ClubSystem.Member member : members) {
-            System.out.println("  ID: " + member.id() + " - " + member.name());
-        }
-
-        double durationMs = (endTime - startTime) / 1_000_000.0;
-        System.out.printf("%nSorting completed in %.3f ms%n", durationMs);
+        members.forEach(m -> System.out.println("  ID: " + m.id() + " - " + m.name()));
+        System.out.printf("%nSorting completed in %.3f ms%n", (end - start) / 1_000_000.0);
     }
 
     private static void sortAndDisplaySports(List<ClubSystem.Sport> sports) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("       SORTING SPORTS BY NAME (Merge Sort)");
         System.out.println("=".repeat(60));
-        System.out.println("Algorithm: Merge Sort");
-        System.out.println("Time Complexity: O(n log n) all cases");
-        System.out.println("Space Complexity: O(n)");
-        System.out.println("Description: Divide-and-conquer algorithm that divides the list");
-        System.out.println("into halves, sorts them, and merges the sorted halves.");
-        System.out.println("-".repeat(60));
+        printAlgorithmInfo("Merge Sort", "O(n log n) all cases", "O(n)",
+                "Divide-and-conquer algorithm that divides list into halves, sorts and merges.");
 
         System.out.println("\n--- Before Sorting ---");
-        for (ClubSystem.Sport sport : sports) {
-            System.out.println("  " + sport.name());
-        }
+        sports.forEach(s -> System.out.println("  " + s.name()));
 
-        long startTime = System.nanoTime();
-        List<ClubSystem.Sport> sortedSports = SortingAlgorithms.mergeSortSports(sports);
-        long endTime = System.nanoTime();
+        long start = System.nanoTime();
+        List<ClubSystem.Sport> sorted = SortingAlgorithms.mergeSortSports(sports);
+        long end = System.nanoTime();
+        sports.clear();
+        sports.addAll(sorted); // update original list
 
         System.out.println("\n--- After Sorting ---");
-        for (ClubSystem.Sport sport : sortedSports) {
-            System.out.println("  " + sport.name());
-        }
-
-        double durationMs = (endTime - startTime) / 1_000_000.0;
-        System.out.printf("%nSorting completed in %.3f ms%n", durationMs);
+        sports.forEach(s -> System.out.println("  " + s.name()));
+        System.out.printf("%nSorting completed in %.3f ms%n", (end - start) / 1_000_000.0);
     }
 
-    // ============================
-    // SEARCHING OPERATIONS
-    // ============================
-
+    // --- Searching ---
     private static void searchClubByName(List<ClubSystem.Club> clubs) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("         SEARCH CLUB BY NAME (Binary Search)");
         System.out.println("=".repeat(60));
-        System.out.println("Prerequisite: Clubs must be sorted by name first.");
-        System.out.println("Time Complexity: O(log n)");
-        System.out.println("-".repeat(60));
+        System.out.println("Prerequisite: Clubs sorted by name. Time Complexity: O(log n)");
 
         SortingAlgorithms.bubbleSortClubs(clubs);
+        System.out.print("\nEnter club name: ");
+        String name = scanner.nextLine().trim();
+        if (name.isEmpty()) return;
 
-        System.out.print("\nEnter club name to search: ");
-        String searchName = scanner.nextLine().trim();
-
-        if (searchName.isEmpty()) {
-            System.out.println("Search cancelled: empty input.");
-            return;
-        }
-
-        long startTime = System.nanoTime();
-        ClubSystem.Club found = BinarySearch.binarySearchClub(clubs, searchName);
-        long endTime = System.nanoTime();
+        long start = System.nanoTime();
+        ClubSystem.Club found = BinarySearch.binarySearchClub(clubs, name);
+        long end = System.nanoTime();
 
         if (found != null) {
-            System.out.println("\n✓ Club found!");
-            System.out.println("  Name:     " + found.name());
-            System.out.println("  Manager:  " + found.manager());
-            System.out.println("  Location: " + found.location());
-            System.out.println("  Branches: " + String.join(", ", found.branches()));
-            System.out.println("  Members:  " + found.members().size());
+            System.out.println("\n✓ Found: " + found.name() + " | Manager: " + found.manager() +
+                    " | Location: " + found.location());
         } else {
-            System.out.println("\n✗ Club not found: \"" + searchName + "\"");
+            System.out.println("\n✗ Club not found.");
         }
-
-        double durationMs = (endTime - startTime) / 1_000_000.0;
-        System.out.printf("%nSearch completed in %.3f ms%n", durationMs);
+        System.out.printf("Search completed in %.3f ms%n", (end - start) / 1_000_000.0);
     }
 
     private static void searchMemberById(List<ClubSystem.Member> members) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("         SEARCH MEMBER BY ID (Binary Search)");
         System.out.println("=".repeat(60));
-        System.out.println("Prerequisite: Members must be sorted by ID first.");
-        System.out.println("Time Complexity: O(log n)");
-        System.out.println("-".repeat(60));
+        System.out.println("Prerequisite: Members sorted by ID. Time Complexity: O(log n)");
 
         SortingAlgorithms.selectionSortMembers(members);
-
-        System.out.print("\nEnter member ID to search: ");
-        String input = scanner.nextLine().trim();
-
-        int searchId;
+        System.out.print("\nEnter member ID: ");
+        int id;
         try {
-            searchId = Integer.parseInt(input);
+            id = Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("Invalid ID format. Please enter a number.");
+            System.out.println("Invalid ID.");
             return;
         }
 
-        long startTime = System.nanoTime();
-        ClubSystem.Member found = BinarySearch.binarySearchMember(members, searchId);
-        long endTime = System.nanoTime();
+        long start = System.nanoTime();
+        ClubSystem.Member found = BinarySearch.binarySearchMember(members, id);
+        long end = System.nanoTime();
 
         if (found != null) {
-            System.out.println("\n✓ Member found!");
-            System.out.println("  ID:       " + found.id());
-            System.out.println("  Name:     " + found.name());
-            System.out.println("  Phone:    " + found.phone());
-            System.out.println("  Children: " + found.numberOfChildren());
+            System.out.println("\n✓ Found: " + found.name() + " (ID: " + found.id() +
+                    "), Phone: " + found.phone() + ", Children: " + found.numberOfChildren());
         } else {
-            System.out.println("\n✗ Member not found with ID: " + searchId);
+            System.out.println("\n✗ Member not found.");
         }
-
-        double durationMs = (endTime - startTime) / 1_000_000.0;
-        System.out.printf("%nSearch completed in %.3f ms%n", durationMs);
+        System.out.printf("Search completed in %.3f ms%n", (end - start) / 1_000_000.0);
     }
 
-    // ============================
-    // ADD OPERATIONS (DB-backed)
-    // ============================
-
+    // --- Add / Remove operations (now via service) ---
     private static void addNewClub(List<ClubSystem.Club> clubs) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("              ADD NEW CLUB");
@@ -291,32 +237,17 @@ public class Main {
 
         System.out.print("Enter club name: ");
         String name = scanner.nextLine().trim();
-        if (name.isEmpty()) {
-            System.out.println("Club name cannot be empty.");
-            return;
-        }
+        if (name.isEmpty()) return;
 
-        System.out.print("Enter manager name: ");
+        System.out.print("Enter manager: ");
         String manager = scanner.nextLine().trim();
-
         System.out.print("Enter location: ");
         String location = scanner.nextLine().trim();
 
-        System.out.print("Enter branches (comma-separated): ");
-        String branchesInput = scanner.nextLine().trim();
-        List<String> branches = new ArrayList<>();
-        if (!branchesInput.isEmpty()) {
-            for (String branch : branchesInput.split(",")) {
-                branches.add(branch.trim());
-            }
-        }
-
-        ClubSystem.Club newClub = new ClubSystem.Club(
-                name, branches, manager, location, new ArrayList<>());
-
-        if (db.addClub(newClub)) {
-            clubs.add(newClub);
-            System.out.println("\n✓ Club \"" + name + "\" added successfully!");
+        if (service.addClub(name, manager, location)) {
+            clubs.clear();
+            clubs.addAll(service.getAllClubs());
+            System.out.println("\n✓ Club added successfully.");
         } else {
             System.out.println("\n✗ Failed to add club.");
         }
@@ -326,53 +257,26 @@ public class Main {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("           ADD NEW MEMBER TO CLUB");
         System.out.println("=".repeat(60));
-
         System.out.println("Available clubs:");
-        for (int i = 0; i < clubs.size(); i++) {
-            System.out.println("  " + (i + 1) + ". " + clubs.get(i).name());
-        }
+        for (ClubSystem.Club c : clubs) System.out.println("  - " + c.name());
 
         System.out.print("\nEnter club name: ");
         String clubName = scanner.nextLine().trim();
-
-        boolean clubExists = clubs.stream()
-                .anyMatch(c -> c.name().equalsIgnoreCase(clubName));
-        if (!clubExists) {
-            System.out.println("Club not found: \"" + clubName + "\"");
-            return;
-        }
-
         System.out.print("Enter member ID: ");
         int id;
-        try {
-            id = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID format.");
-            return;
-        }
-
-        System.out.print("Enter member name: ");
+        try { id = Integer.parseInt(scanner.nextLine().trim()); } catch (NumberFormatException e) { return; }
+        System.out.print("Enter name: ");
         String name = scanner.nextLine().trim();
-
-        System.out.print("Enter phone number: ");
+        System.out.print("Enter phone: ");
         String phone = scanner.nextLine().trim();
-
-        System.out.print("Enter number of children: ");
+        System.out.print("Enter children count: ");
         int children;
-        try {
-            children = Integer.parseInt(scanner.nextLine().trim());
-            if (children < 0) children = 0;
-        } catch (NumberFormatException e) {
-            children = 0;
-        }
+        try { children = Integer.parseInt(scanner.nextLine().trim()); } catch (NumberFormatException e) { children = 0; }
 
-        ClubSystem.Member newMember = new ClubSystem.Member(id, name, phone, children);
-
-        if (db.addMemberToClub(clubName, newMember)) {
-            // Refresh from DB to keep lists in sync
+        if (service.addMemberToClub(clubName, id, name, phone, children)) {
             clubs.clear();
-            clubs.addAll(db.getAllClubs());
-            System.out.println("\n✓ Member \"" + name + "\" added to \"" + clubName + "\" successfully!");
+            clubs.addAll(service.getAllClubs());
+            System.out.println("\n✓ Member added.");
         } else {
             System.out.println("\n✗ Failed to add member.");
         }
@@ -382,119 +286,88 @@ public class Main {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("              ADD NEW SPORT");
         System.out.println("=".repeat(60));
-
         System.out.print("Enter sport name: ");
         String name = scanner.nextLine().trim();
-        if (name.isEmpty()) {
-            System.out.println("Sport name cannot be empty.");
-            return;
-        }
-
+        if (name.isEmpty()) return;
         System.out.print("Enter sport ID: ");
         int id;
-        try {
-            id = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID format.");
-            return;
-        }
-
-        System.out.print("Enter number of teams: ");
+        try { id = Integer.parseInt(scanner.nextLine().trim()); } catch (NumberFormatException e) { return; }
+        System.out.print("Enter teams count: ");
         int teams;
-        try {
-            teams = Integer.parseInt(scanner.nextLine().trim());
-            if (teams < 0) teams = 0;
-        } catch (NumberFormatException e) {
-            teams = 0;
-        }
+        try { teams = Integer.parseInt(scanner.nextLine().trim()); } catch (NumberFormatException e) { teams = 0; }
 
-        ClubSystem.Sport newSport = new ClubSystem.Sport(name, id, teams);
-
-        if (db.addSport(newSport)) {
-            sports.add(newSport);
-            System.out.println("\n✓ Sport \"" + name + "\" added successfully!");
+        if (service.addSport(name, id, teams)) {
+            sports.clear();
+            sports.addAll(service.getAllSports());
+            System.out.println("\n✓ Sport added.");
         } else {
             System.out.println("\n✗ Failed to add sport.");
         }
     }
 
-    // ============================
-    // REMOVE OPERATIONS (DB-backed)
-    // ============================
-
     private static void removeMember(List<ClubSystem.Club> clubs) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("           REMOVE MEMBER FROM CLUB");
         System.out.println("=".repeat(60));
-
         System.out.println("Available clubs:");
-        for (ClubSystem.Club club : clubs) {
-            System.out.println("  - " + club.name() + " (" + club.members().size() + " members)");
-        }
+        for (ClubSystem.Club c : clubs) System.out.println("  - " + c.name());
 
         System.out.print("\nEnter club name: ");
         String clubName = scanner.nextLine().trim();
+        System.out.print("Enter member ID: ");
+        int id;
+        try { id = Integer.parseInt(scanner.nextLine().trim()); } catch (NumberFormatException e) { return; }
 
-        System.out.print("Enter member ID to remove: ");
-        int memberId;
-        try {
-            memberId = Integer.parseInt(scanner.nextLine().trim());
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID format.");
-            return;
-        }
-
-        if (db.removeMemberFromClub(clubName, memberId)) {
-            // Refresh from DB to keep lists in sync
+        if (service.removeMemberFromClub(clubName, id)) {
             clubs.clear();
-            clubs.addAll(db.getAllClubs());
-            System.out.println("\n✓ Member with ID " + memberId + " removed from \"" + clubName + "\" successfully!");
+            clubs.addAll(service.getAllClubs());
+            System.out.println("\n✓ Member removed.");
         } else {
-            System.out.println("\n✗ Member not found or club does not exist.");
+            System.out.println("\n✗ Failure: member or club not found.");
         }
     }
 
-    // ============================
-    // STATISTICS (DB-backed)
-    // ============================
-
+    // --- Statistics ---
     private static void displayStatistics(List<ClubSystem.Club> clubs,
-            List<ClubSystem.Member> members,
-            List<ClubSystem.Sport> sports) {
+                                          List<ClubSystem.Member> members,
+                                          List<ClubSystem.Sport> sports) {
         System.out.println("\n" + "=".repeat(60));
         System.out.println("              SYSTEM STATISTICS");
         System.out.println("=".repeat(60));
 
+        ClubManagementService.SystemStatistics stats = service.getStatistics();
+
         System.out.println("Data Overview:");
-        System.out.println("  Total Clubs:   " + clubs.size());
-        System.out.println("  Total Members: " + db.getTotalMemberCount());
-        System.out.println("  Total Sports:  " + sports.size());
+        System.out.println("  Total Clubs:   " + stats.totalClubs());
+        System.out.println("  Total Members: " + stats.totalMembers());
+        System.out.println("  Total Sports:  " + stats.totalSports());
 
         System.out.println("\nClub Details:");
-        int totalMembersAcrossClubs = 0;
-        for (ClubSystem.Club club : clubs) {
-            int memberCount = club.members().size();
-            totalMembersAcrossClubs += memberCount;
+        for (ClubSystem.Club c : clubs) {
             System.out.printf("  %-15s | Location: %-15s | Members: %d%n",
-                    club.name(), club.location(), memberCount);
+                    c.name(), c.location(), c.members().size());
         }
 
         System.out.println("\nMember Statistics:");
-        int totalChildren = db.getTotalChildren();
-        System.out.println("  Total Children: " + totalChildren);
-        System.out.printf("  Average Children per Member: %.2f%n",
-                members.isEmpty() ? 0 : (double) totalChildren / members.size());
+        System.out.println("  Total Children: " + stats.totalChildren());
+        System.out.printf("  Average Children per Member: %.2f%n", stats.avgChildrenPerMember());
 
         System.out.println("\nSport Statistics:");
-        int totalTeams = db.getTotalTeams();
-        System.out.println("  Total Teams: " + totalTeams);
-        System.out.printf("  Average Teams per Sport: %.2f%n",
-                sports.isEmpty() ? 0 : (double) totalTeams / sports.size());
+        System.out.println("  Total Teams: " + stats.totalTeams());
+        System.out.printf("  Average Teams per Sport: %.2f%n", stats.avgTeamsPerSport());
 
         System.out.println("\nAlgorithm Performance Summary:");
         System.out.println("  Bubble Sort (Clubs):     O(n²) time, O(1) space");
         System.out.println("  Selection Sort (Members):  O(n²) time, O(1) space");
         System.out.println("  Merge Sort (Sports):     O(n log n) time, O(n) space");
         System.out.println("  Binary Search:           O(log n) time, O(1) space");
+    }
+
+    private static void printAlgorithmInfo(String name, String time, String space, String desc) {
+        System.out.println("Algorithm: " + name);
+        System.out.println("Time Complexity: " + time);
+        System.out.println("Space Complexity: " + space);
+        System.out.println("Description: " + desc);
+        System.out.println("-".repeat(60));
     }
 }
