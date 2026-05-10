@@ -23,6 +23,9 @@ pkgs.mkShell {
   buildInputs = with pkgs; [
     jdk21
     gradle
+
+    gource
+    ffmpeg-full
   ];
 
   shellHook = ''

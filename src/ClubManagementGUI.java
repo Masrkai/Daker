@@ -304,7 +304,7 @@ public class ClubManagementGUI extends JFrame {
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(160, 35));
         btn.setFont(new Font("Arial", Font.BOLD, 12));
-        btn.setForeground(Color.BLACK);
+        btn.setForeground(Color.WHITE);
         btn.setBackground(new Color(225, 225, 225));
         btn.setFocusPainted(false);
         return btn;
